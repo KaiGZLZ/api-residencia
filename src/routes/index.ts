@@ -1,16 +1,13 @@
-// const notFound = require('./routes/notFound');
-import sedesRouter from './routes/sedes.routes';
-// import pagosRouter from './routes/pagos.routes';
-// import residentesRouter from './routes/residentes.routes';
-// import sedesRouter from './routes/sedes.routes';
-// import habitacionesRouter from './routes/habitaciones.routes';
-
-
+import notFound from './notFound';
+import pagosRouter from './pagos.routes';
+import residentesRouter from './residentes.routes';
+import sedesRouter from './sedes.routes';
+import habitacionesRouter from './habitaciones.routes';
 
 export default {
-//   pagosRouter,
-//   residentesRouter,
+  pagosRouter,
+  residentesRouter,
   sedesRouter,
-//   habitacionesRouter,
-//   notFound,
+  habitacionesRouter,
+  notFound,
 };

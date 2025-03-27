@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "tsc": "tsc",
+    "build": "tsc",
     "start": "node build/index.js",
     "dev": "ts-node-dev src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -18,6 +19,10 @@
     "typescript": "^5.8.2"
   },
   "dependencies": {
-    "express": "^4.21.2"
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "joi": "^17.13.3",
+    "mysql2": "^3.14.0",
+    "sequelize": "^6.37.6"
   }
 }
