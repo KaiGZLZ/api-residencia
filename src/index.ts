@@ -11,7 +11,7 @@ const app = express();
 app.use(
   cors({
     origin: '*', // Permite solicitudes desde cualquier origen. Cambia esto si necesitas restringirlo.
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos HTTP permitidos
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], // Métodos HTTP permitidos
     allowedHeaders: ['Content-Type', 'Authorization', 'token'], // Incluye 'token' como encabezado permitido
   })
 );
