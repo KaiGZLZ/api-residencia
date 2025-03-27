@@ -31,6 +31,7 @@ const postOne = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const data = {
       body: req.body,
+      files: req.files,
     };
     const serviceResponse = await pagosService.postOne(data);
     res.status(201).json(serviceResponse);

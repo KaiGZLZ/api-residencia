@@ -10,10 +10,11 @@ export class Pago
 {
   public idPago!: number;
   public uuidPago!: string;
-  public monto!: number;
   public idHabitacion!: number;
   public idResidente!: number;
   public idSede!: number;
+  public monto!: number;
+  public urlComprobante!: string;
   public createdAt!: Date;
   public updatedAt!: Date;
 
@@ -66,6 +67,10 @@ export default (sequelize: Sequelize) => {
           model: 'Sedes',
           key: 'idSede',
         },
+      },
+      urlComprobante: {
+        type: DataTypes.STRING,
+        allowNull: false,
       },
       createdAt: {
         type: DataTypes.DATE,

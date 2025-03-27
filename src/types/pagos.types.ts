@@ -1,3 +1,5 @@
+import { FileArray } from 'express-fileupload';
+
 export interface PagoAttributes {
   idPago: number;
   uuidPago: string;
@@ -5,6 +7,7 @@ export interface PagoAttributes {
   idHabitacion: number;
   idSede: number;
   monto: number;
+  urlComprobante: string;
   createdAt: Date; // ISO timestamp
   updatedAt: Date; // ISO timestamp
 }
@@ -25,6 +28,7 @@ export interface PostOnePago {
     uuidPago: string;
     idResidente: number;
   };
+  files: FileArray | null | undefined;
 }
 
 // Para la ruta GetOne (obtener un pago por idPago)

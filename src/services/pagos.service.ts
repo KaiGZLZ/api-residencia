@@ -6,8 +6,11 @@ import {
 } from '../types/pagos.types';
 import CustomError from '../utils/customError';
 import { Habitaciones, Pagos, Residentes } from '../models';
+import s3 from '../utils/s3';
+import { Op } from 'sequelize';
 
 import crearWhereQuery from '../utils/querys';
+import { UploadedFile } from 'express-fileupload';
 
 const getOne = async (data: GetOnePago) => {
   const registro = await Pagos.findOne({
@@ -56,7 +59,31 @@ const getMany = async (data: GetManyPagosQuery) => {
 };
 
 const postOne = async (data: PostOnePago) => {
-  // En base a los datos del residente, se rellenan todos los datos
+  // Se comprueba que venga la infomacion del comprobante
+  if (!data.files?.comprobante) {
+    const error = new CustomError('Comprobante no encontrado', 400);
+    throw error;
+  }
+
+  // Se verifica que no haya habido un pago previo en los ultimos 20 dias
+  const pagoExistente = await Pagos.findOne({
+    where: {
+      idResidente: data.body.idResidente,
+      createdAt: {
+        [Op.gte]: new Date(new Date().getTime() - 20 * 24 * 60 * 60 * 1000),
+      },
+    },
+  });
+
+  if (pagoExistente) {
+    const error = new CustomError(
+      'Ya se ha realizado un pago en los ultimos 20 dias. Si desea siente que esto es un error, por favor contacte a soporte',
+      400
+    );
+    throw error;
+  }
+
+  // Se busca al residente y toda su informacion
   const residente = await Residentes.findOne({
     where: {
       idResidente: data.body.idResidente,
@@ -81,12 +108,32 @@ const postOne = async (data: PostOnePago) => {
     throw error;
   }
 
+  //  Posteriormente se guarda el archivo en S3
+  const comprobante = data.files?.comprobante as UploadedFile;
+
+  // Se guarda en el path public/comprobantes/(habitacion-idHabitacion)/(fecha).(extension)
+  const keyComprobante = `public/comprobantes/habitacion-${
+    residente.idHabitacion
+  }/${new Date().toISOString().split('T')[0]}.${
+    comprobante.mimetype.split('/')[1]
+  }`;
+
+  // Se guarda el archivo en S3
+  await s3.uploadFile({
+    BucketName: process.env.S3_BUCKET_NAME || '',
+    Key: keyComprobante,
+    ContentType: comprobante.mimetype,
+    BufferData: comprobante.data,
+  });
+
+  // En base a los datos del residente, se rellenan todos los datos
   const registro = await Pagos.create({
     uuidPago: data.body.uuidPago,
     idResidente: residente.idResidente,
     idHabitacion: residente.idHabitacion,
     idSede: residente.idSede,
     monto: residente.habitacion?.precio || 0,
+    urlComprobante: `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${keyComprobante}`,
   });
 
   return {
